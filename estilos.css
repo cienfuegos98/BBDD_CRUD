@@ -1,0 +1,27 @@
+
+fieldset{
+  border: 0.25em solid;
+  align : center;
+  position: absolute;
+  left: 20%;
+  top: 30%;
+  margin-left: -115px;
+  margin-top: -80px;
+  padding:10px;
+  background-color: #eee;
+}
+ 
+legend{
+    font-size: 2em;
+    color: green;
+    font-weight: bold;
+}
+input[type=submit] {
+    padding:5px 15px 10px 10px; 
+    background:#ccc; 
+    border:2;
+    cursor:pointer;
+    border-radius: 5px; 
+    margin: 1em;
+    font-size: 1em;
+}
