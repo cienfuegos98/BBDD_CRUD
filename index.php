@@ -1,10 +1,32 @@
+
+<?php
+spl_autoload_register(function($nombre_clase) {
+    include $nombre_clase . '.php';
+});
+
+session_start();
+
+if (isset($_POST['submit'])) {
+    switch ($_POST['submit']) {
+        case "Conectar":
+            $bd = new BD("172.17.0.2");
+            $user = $_POST['usuario'];
+            $pass = $_POST['pass'];
+            $host = $_POST['host'];
+            $_SESSION['user'] = $bd;
+            $conectado = true;
+            break;
+        case "Gestionar":
+            break;
+
+        default:
+            break;
+    }
+}
+?>
 <!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
-<html><head>
+<html>
+    <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Ejemplo de estilos CSS en un archivo externo</title>
         <link rel="stylesheet" type="text/css" href="estilos.css" media="screen">
@@ -21,18 +43,22 @@ and open the template in the editor.
                 <input type="text" name="usuario" value="root" id="">
                 <label for="pass">Password</label>
                 <input type="text" name="pass" value="root" id="">
-                <input type="submit" value="Conectar" name="conectar">
+                <input type="submit" value="Conectar" name="submit">
             </form>
 
         </fieldset>
+        <?php if ($conectado === true): ?>
 
-        <fieldset style="width:70%; margin-top:8%">
-            <legend>Gestion de las Bases de Datos del host <span class="resaltar">???BBDD????</span></legend>
-            <form action="tablas.php" method="post">
-                -------"lista de bases de datos"--------<br/>
-                <input type="submit" value="Gestionar">
-            </form>
-        </fieldset>
+            <fieldset style = "width:70%; margin-top:8%">
+                <legend>Gestion de las Bases de Datos del host <span class = "resaltar"><span style="color:red"><?php echo $host
+            ?></span></span></legend>
+                <form action="tablas.php" method="post">
+                    SHOW DATABASES WHERE User="xxxxx";<br/>
+                    <input type="submit"value="gestionar" name="submit">
+                </form>
+            </fieldset>
+        <?php endif; ?>
+
 
 
     </body></html>

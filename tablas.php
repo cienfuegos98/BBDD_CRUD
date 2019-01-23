@@ -17,7 +17,7 @@
         <fieldset style="width:70%; margin-top:8%">
             <legend>Gestion de las Bases de Datos <span class="resaltar"></span></legend>
             <form action="gestionTabla.php" method="post">
-                <input type="submit" value="boton" name="boton">-----botones----
+                <input type="submit" value="boton" name="boton">SHOW TABLES IN (database)
             </form>
         </fieldset>
     </body>
