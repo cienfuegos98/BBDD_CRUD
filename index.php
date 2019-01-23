@@ -3,25 +3,28 @@
 spl_autoload_register(function($nombre_clase) {
     include $nombre_clase . '.php';
 });
-
-session_start();
+$host = "";
+$conectado = false;
+$radios = "";
+$error = "";
 
 if (isset($_POST['submit'])) {
-    switch ($_POST['submit']) {
-        case "Conectar":
-            $bd = new BD("172.17.0.2");
-            $user = $_POST['usuario'];
-            $pass = $_POST['pass'];
-            $host = $_POST['host'];
-            $_SESSION['user'] = $bd;
-            $conectado = true;
-            break;
-        case "Gestionar":
-            break;
+    $user = $_POST['usuario'];
+    $pass = $_POST['pass'];
+    $host = $_POST['host'];
 
-        default:
-            break;
+
+    $con = new BD($host, $user, $pass);
+    $error = $con->getError();
+    if ($error == "") {
+        $conectado = true;
+        $r = $con->consulta('SHOW DATABASES');
+        while (( $dbNames = $r->fetchColumn(0) ) !== false) {
+            $radios .= "<input type='radio' name='radio' value='$dbNames'> $dbNames<br>";
+        }
     }
+    //        $_SESSION['user'] = $bd;
+    $con->cerrar();
 }
 ?>
 <!DOCTYPE html>
@@ -32,8 +35,10 @@ if (isset($_POST['submit'])) {
         <link rel="stylesheet" type="text/css" href="estilos.css" media="screen">
         <meta charset="UTF-8">
         <title></title>
+
     </head>
     <body>
+        <header><?php echo $error ?></header>
         <fieldset id="sup" style="width:70%">
             <legend>Datos de conexión</legend>
             <form action="." method="POST">
@@ -47,18 +52,16 @@ if (isset($_POST['submit'])) {
             </form>
 
         </fieldset>
-        <?php if ($conectado === true): ?>
-
+        <?php if ($conectado == true): ?>
             <fieldset style = "width:70%; margin-top:8%">
                 <legend>Gestion de las Bases de Datos del host <span class = "resaltar"><span style="color:red"><?php echo $host
             ?></span></span></legend>
                 <form action="tablas.php" method="post">
-                    SHOW DATABASES WHERE User="xxxxx";<br/>
+                    <br/>
                     <input type="submit"value="gestionar" name="submit">
                 </form>
+                <?php echo $radios ?>
             </fieldset>
         <?php endif; ?>
-
-
-
-    </body></html>
+    </body>
+</html>
