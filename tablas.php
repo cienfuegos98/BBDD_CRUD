@@ -1,3 +1,29 @@
+<?php
+spl_autoload_register(function($nombre_clase) {
+    include $nombre_clase . '.php';
+});
+
+$bd = $_POST['radio'];
+
+session_start();
+
+$host = $_SESSION['conexion'][0];
+$user = $_SESSION['conexion'][1];
+$pass = $_SESSION['conexion'][2];
+$_SESSION['conexion'][3] = $bd;
+
+$con = new BD($host, $user, $pass, $bd);
+
+if ($error == null) {
+    $r = $con->consulta("SHOW TABLES");
+    while (( $tableNames = $r->fetchColumn(0) ) !== false) {
+        $botones .= "<input type='submit' name='botones' value='$tableNames'>";
+    }
+}
+?>
+
+
+
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -17,7 +43,7 @@
         <fieldset style="width:70%; margin-top:8%">
             <legend>Gestion de las Bases de Datos <span class="resaltar"></span></legend>
             <form action="gestionTabla.php" method="post">
-                <input type="submit" value="boton" name="boton">SHOW TABLES IN (database)
+                <?php echo $botones ?>
             </form>
         </fieldset>
     </body>

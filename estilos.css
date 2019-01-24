@@ -28,3 +28,10 @@ input[type=submit] {
 header{
     background-color: red;
 }
+table {
+  border-collapse: collapse;
+}
+
+table, th, td, tr{
+  border: 1px solid black;
+}

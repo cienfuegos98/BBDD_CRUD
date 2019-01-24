@@ -7,25 +7,27 @@ $host = "";
 $conectado = false;
 $radios = "";
 $error = "";
-
-if (isset($_POST['submit'])) {
+session_start();
+if (isset($_POST['conectar'])) {
     $user = $_POST['usuario'];
     $pass = $_POST['pass'];
     $host = $_POST['host'];
 
-
     $con = new BD($host, $user, $pass);
     $error = $con->getError();
-    if ($error == "") {
+    if ($error == null) {
         $conectado = true;
         $r = $con->consulta('SHOW DATABASES');
         while (( $dbNames = $r->fetchColumn(0) ) !== false) {
             $radios .= "<input type='radio' name='radio' value='$dbNames'> $dbNames<br>";
         }
     }
-    //        $_SESSION['user'] = $bd;
+    $_SESSION['conexion'] = [$host, $user, $pass];
+
     $con->cerrar();
 }
+
+//Mejor poner errror como attributo de la base de datos
 ?>
 <!DOCTYPE html>
 <html>
@@ -38,29 +40,32 @@ if (isset($_POST['submit'])) {
 
     </head>
     <body>
-        <header><?php echo $error ?></header>
+        <header><?php echo $error ?? null ?></header>
         <fieldset id="sup" style="width:70%">
             <legend>Datos de conexión</legend>
             <form action="." method="POST">
                 <label for="host">Host</label>
-                <input type="text" name="host" value="localhost" id="">
+                <input type="text" name="host" value="172.17.0.2" id="">
                 <label for="usuario">Usuario</label>
                 <input type="text" name="usuario" value="root" id="">
                 <label for="pass">Password</label>
                 <input type="text" name="pass" value="root" id="">
-                <input type="submit" value="Conectar" name="submit">
+                <input type="submit" value="Conectar" name="conectar">
             </form>
 
         </fieldset>
         <?php if ($conectado == true): ?>
+
             <fieldset style = "width:70%; margin-top:8%">
                 <legend>Gestion de las Bases de Datos del host <span class = "resaltar"><span style="color:red"><?php echo $host
             ?></span></span></legend>
                 <form action="tablas.php" method="post">
                     <br/>
-                    <input type="submit"value="gestionar" name="submit">
+                    <input type="submit"value="Gestionar" name="gestionar"><br>
+                    <?php
+                    echo $radios;
+                    ?>
                 </form>
-                <?php echo $radios ?>
             </fieldset>
         <?php endif; ?>
     </body>
