@@ -22,8 +22,6 @@ if ($error == null) {
 }
 ?>
 
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -34,7 +32,7 @@ if ($error == null) {
     </head>
     <body>
         <fieldset id="sup" style="width:25%">
-            <legend>Listado bases de datos</legend>
+            <legend>Listado bases de datos de <span  style="color:red"><?php echo $bd ?></span></legend>
             <form action="index.php" method="POST">
                 <input type="submit" value="Volver" name="volver">
             </form>
