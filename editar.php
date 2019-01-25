@@ -12,10 +12,6 @@ $pass = $_SESSION['conexion'][2];
 $bd = $_SESSION['conexion'][3];
 
 $con = new BD($host, $user, $pass, $bd);
-if (isset($_POST['modificar'])) {
-    $valor = $_POST['key'];
-    echo "-$valor-";
-}
 ?>
 
 <!doctype html>
@@ -44,7 +40,6 @@ if (isset($_POST['modificar'])) {
                 <br/><br/>
                 <input type="submit" value="Modificar" name="submit">
                 <input type="submit" value="Cancelar" name="submit">
-                <input type="hidden" value="<?php echo $value ?>" name="cod">
             </form>
         </fieldset>
     </body>

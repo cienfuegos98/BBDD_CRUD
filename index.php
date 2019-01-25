@@ -45,7 +45,7 @@ if (isset($_POST['conectar'])) {
             <legend>Datos de conexión</legend>
             <form action="." method="POST">
                 <label for="host">Host</label>
-                <input type="text" name="host" value="localhost" id="">
+                <input type="text" name="host" value="172.17.0.2" id="">
                 <label for="usuario">Usuario</label>
                 <input type="text" name="usuario" value="root" id="">
                 <label for="pass">Password</label>
