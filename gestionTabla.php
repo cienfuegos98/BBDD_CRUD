@@ -2,8 +2,6 @@
 spl_autoload_register(function($nombre_clase) {
     include $nombre_clase . '.php';
 });
-$datoKey;
-$campoKey;
 $nombreTabla = $_POST['botones'];
 session_start();
 $host = $_SESSION['conexion'][0];
@@ -16,21 +14,20 @@ function obtenerTabla($con, $nombreTabla) {
     $filas = $con->selection("SELECT * FROM $nombreTabla");
     $campos = $con->nombres_campos($nombreTabla);
     $tabla = "<table><tr>";
-    foreach ($campos as $i => $campo) {
-        $tabla .= "<th> $campos[$i]</th>";
+    foreach ($campos as $campo) {
+        $tabla .= "<th> $campo</th>";
     }
     $tabla .= "<th> Acciones</th>";
     $tabla .= "</tr>";
     foreach ($filas as $datos) {
-        $tabla .= "<form action = 'gestionTabla.php' method = POST>"
-                . "<input type = hidden value = '$valor' name = 'key'>"
-                . "<tr>";
+        $tabla .= "<tr><form action = 'editar.php' method = POST>";
         foreach ($campos as $i => $fila) {
-            $datoKey = $datos[0];
-
-            $tabla .= "<td>$datos[$i]</td>";
+            $tabla .= "<td>$datos[$i]</td>"
+                    . "<input type = hidden value = '$datos[$i]' name = 'campos[$campos[$i]]' >";
+            var_dump($campos[$i]);
         }
-        $tabla .= "<td><input type = 'submit' value = 'Editar' name = 'submit'><input type = 'submit' value = 'Delete' name = 'submit'></td></tr></form>";
+        $tabla .= "<td><input type = 'submit' value = 'Editar' name = 'submit'><input type = 'submit' value = 'Delete' name = 'submit'></td></form>"
+                . "</tr>";
     }
     $tabla .= "</table>";
     return $tabla;
@@ -39,16 +36,15 @@ function obtenerTabla($con, $nombreTabla) {
 $submit = $_POST['submit'];
 if (isset($submit)) {
     switch ($submit) {
-        case "Editar":
-            header("Location: editar.php?valor=$valor");
-            break;
         case "Delete":
-            var_dump($datoKey);
-            $c = "DELETE FROM $nombreTabla WHERE ";
-            $con->run($c);
+//            $c = "DELETE FROM $nombreTabla WHERE ";
+//            $con->run($c);
             break;
-        case "Add":
-            header("Location: editar.php?valor=$valor");
+        case "Modificar":
+            header("Location: editar.php");
+            break;
+        case "Editar":
+            header("Location: editar.php");
             break;
     }
 }
@@ -67,7 +63,7 @@ if (isset($submit)) {
             <legend>Admnistración de la tabla <span  style="color:red"><?php echo $nombreTabla ?></span></legend>
                 <?php echo obtenerTabla($con, $nombreTabla) ?>
             <form action="gestionTabla.php" method="post">
-                <input type="submit" value="Add" name="submit">
+                <input type="submit" value="Modificar" name="submit">
                 <input type="submit" value="Close" name="submit">
             </form>
         </fieldset>
