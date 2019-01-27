@@ -3,17 +3,18 @@ spl_autoload_register(function($nombre_clase) {
     include $nombre_clase . '.php';
 });
 
-$bd = $_POST['radio'];
 
 session_start();
-
+$bd = $_POST['radio'];
 $host = $_SESSION['conexion'][0];
 $user = $_SESSION['conexion'][1];
 $pass = $_SESSION['conexion'][2];
 $_SESSION['conexion'][3] = $bd;
 
-$con = new BD($host, $user, $pass, $bd);
 
+$con = new BD($host, $user, $pass, $bd);
+$error = $con->getError();
+$botones = "";
 if ($error == null) {
     $r = $con->consulta("SHOW TABLES");
     while (( $tableNames = $r->fetchColumn(0) ) !== false) {

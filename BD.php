@@ -63,10 +63,9 @@ class BD {
         return $campos;
     }
 
-    public function run($c) {
-
-        $r = $this->con->prepare($c);
-        $r->execute($parametros);
+    public function run($c, $datos) {
+        $stmt = $this->con->prepare($c);
+        $r = $stmt->execute($datos);
         return $r;
     }
 

@@ -26,8 +26,15 @@ if (isset($_POST['conectar'])) {
 
     $con->cerrar();
 }
-
-//Mejor poner errror como attributo de la base de datos
+if (isset($_SESSION['conexion'])) {
+//Si ya he establecido previamente conexión, recojo los datos de sesión
+//Si no contendrán null y la conexión fallará y me informará de ello
+    $conexion = $_SESSION['conexion'];
+} else {
+    $_SESSION['conexion'][0] = 'localhost';
+    $_SESSION['conexion'][1] = 'root';
+    $_SESSION['conexion'][2] = 'root';
+}
 ?>
 <!DOCTYPE html>
 <html>
