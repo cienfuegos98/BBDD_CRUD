@@ -26,6 +26,7 @@ class BD {
     private function conexion() {
         try {
             $con = new PDO("mysql:host=$this->host;dbname=$this->bd", $this->user, $this->pass);
+            $con->query("SET NAMES 'utf8'");
             return $con;
         } catch (Exception $e) {
             $this->error = $e->getMessage();
@@ -63,10 +64,9 @@ class BD {
         return $campos;
     }
 
-    public function run($c, $datos) {
+    public function run($c) {
         $stmt = $this->con->prepare($c);
-        $r = $stmt->execute($datos);
-        return $r;
+        $stmt->execute();
     }
 
 }

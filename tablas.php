@@ -5,12 +5,19 @@ spl_autoload_register(function($nombre_clase) {
 
 
 session_start();
-$bd = $_POST['radio'];
+if ($_POST['gestionar']) {
+    $bd = $_POST['radio'];
+}
+
 $host = $_SESSION['conexion'][0];
 $user = $_SESSION['conexion'][1];
 $pass = $_SESSION['conexion'][2];
-$_SESSION['conexion'][3] = $bd;
 
+if (isset($_SESSION['conexion'][3]) && (is_null($bd))) {
+    $bd = $_SESSION['conexion'][3];
+}
+
+$_SESSION['conexion'][3] = $bd;
 
 $con = new BD($host, $user, $pass, $bd);
 $error = $con->getError();

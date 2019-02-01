@@ -23,19 +23,15 @@ if (isset($_POST['conectar'])) {
         }
     }
     $_SESSION['conexion'] = [$host, $user, $pass];
-
     $con->cerrar();
 }
 if (isset($_SESSION['conexion'])) {
 //Si ya he establecido previamente conexión, recojo los datos de sesión
 //Si no contendrán null y la conexión fallará y me informará de ello
     $conexion = $_SESSION['conexion'];
-} else {
-    $_SESSION['conexion'][0] = 'localhost';
-    $_SESSION['conexion'][1] = 'root';
-    $_SESSION['conexion'][2] = 'root';
 }
 ?>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -62,7 +58,6 @@ if (isset($_SESSION['conexion'])) {
 
         </fieldset>
         <?php if ($conectado == true): ?>
-
             <fieldset style = "width:70%; margin-top:8%">
                 <legend>Gestion de las Bases de Datos del host <span class = "resaltar"><span style="color:red"><?php echo $host
             ?></span></span></legend>

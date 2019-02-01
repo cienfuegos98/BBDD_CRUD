@@ -13,52 +13,90 @@ $bd = $_SESSION['conexion'][3];
 
 $con = new BD($host, $user, $pass, $bd);
 
-$datos = $_POST['campos'];
+$boton = $_GET['boton'];
+if ($_GET['boton'] == "añadir") {
+    $nombreTabla = $_GET['tabla'];
+    $campos = $_GET['campos'];
+    $campos = unserialize($campos);
+    $btn = "Insertar";
+} else {
+    $campos = $_GET['campos'];
+    $campos = unserialize($campos);
+    $nombreTabla = $_GET['tabla'];
+    $btn = "Guardar";
+}
 
-$nombreTabla = $_POST['tabla'];
-$contenidosViejos = [];
-
-function obtenerTitulos($datos, $contenidosNuevos) {
-    foreach ($datos as $i => $campo) {
-        echo "<label>$i</label>"
-        . "<input type='text' name='contenidosNuevos[]' value='$campo'><br>"
-        . "<input type='hidden' name='contenidosViejos[]' value='$campo'>"
-        . "<input type = 'hidden' name = 'titulos[]' value = '$i'>";
+function obtenerFormulario($campos, $boton) {
+    foreach ($campos as $i => $campo) {
+        if ($boton == "añadir") {
+            echo "<label>$i</label>"
+            . "<input type='text' name='valorNuevo[]' value=''><br>"
+            . "<input type='hidden' name='campos[$i]' value=''><br>"
+            . "<input type='hidden' name='valorAnt[]' value=''><br>";
+        } else {
+            echo "<label>$i</label>"
+            . "<input type='text' name='valorNuevo[]' value='$campo'><br>"
+            . "<input type='hidden' name='campos[$i]' value='$campo'><br>"
+            . "<input type='hidden' name='valorAnt[]' value='$campo'><br>";
+        }
     }
 }
 
-$contenidosNuevos = $_POST['contenidosNuevos'];
-$x = 1;
-$c = "UPDATE $nombreTabla SET ";
-foreach ($datos as $i => $campo) {
-    if ($x >= count($datos)) {
-        $c .= "$i = :$i";
-    } else {
-        $c .= "$i = :$i, ";
-    }
-    $x++;
-    $contenidosNuevos[] = $i;
-    //$c->bindParam(":$i", $contenidos);
-}
-$c .= " WHERE $i = $contenidosViejos[0]";
-
-
-
-$error = $con->getError();
-
-echo $c;
-if (isset($_POST['submit'])) {
-    switch ($_POST['submit']) {
+if (isset($_POST['accion'])) {
+    $nombreTabla = $_POST['nombreTabla'];
+    switch ($_POST['accion']) {
         case "Guardar":
-
+            $valorNuevo = $_POST['valorNuevo'];
+            $valorAnt = $_POST['valorAnt'];
+            $campos = $_POST['campos'];
+            $res = generaSentenciaUpdate($nombreTabla, $campos, $valorAnt, $valorNuevo);
+            $con->run($res);
+            header("Location:gestionTabla.php?nombreTabla=$nombreTabla");
             break;
+        case "Insertar":
+            $valorNuevo = $_POST['valorNuevo'];
+            $campos = $_POST['campos'];
+            $res = generaInsert($nombreTabla, $campos, $valorNuevo);
+            $con->run($res);
+            header("Location:gestionTabla.php?nombreTabla=$nombreTabla");
+            break;
+
         case "Cancelar":
-            header("Location:gestionTabla.php");
+            header("Location:gestionTabla.php?nombreTabla=$nombreTabla");
             break;
 
         default:
             break;
     }
+}
+
+function generaSentenciaUpdate($nombreTabla, $campos, $valorAnt, $valorNuevo) {
+    $indice = 0;
+    foreach ($campos as $titulo => $campo) {
+        $set .= "$titulo = '" . $valorNuevo[$indice] . "', ";
+        $where .= "$titulo = '" . $valorAnt[$indice] . "' and ";
+        $indice++;
+    }
+    $set = substr($set, 0, strlen($set) - 2);
+    $where = substr($where, 0, strlen($where) - 4);
+    $sentencia = "UPDATE $nombreTabla SET $set WHERE $where";
+    return $sentencia;
+}
+
+function generaInsert($nombreTabla, $campos, $valorNuevo) {
+    $columns = "";
+    $indice = 0;
+    $values = "VALUES(";
+    $sentencia = "INSERT INTO $nombreTabla(";
+    foreach ($campos as $titulo => $campo) {
+        $columns .= "$titulo,";
+        $values .= "'$valorNuevo[$indice]',";
+        $indice++;
+    }
+    $columns = substr($columns, 0, strlen($columns) - 1) . ")";
+    $values = substr($values, 0, strlen($values) - 1) . ")";
+    $sentencia .= "$columns $values";
+    return $sentencia;
 }
 ?>
 
@@ -86,11 +124,11 @@ if (isset($_POST['submit'])) {
     <body>
         <fieldset>
             <legend><h2>Editanto Registro de la tabla <span style="color: red"><?php echo $nombreTabla ?></span></h2></legend>
-            <form action="gestionTabla.php" method="POST">
-                <?php obtenerTitulos($datos, $contenidosNuevos); ?>
-                <input type='submit' name='submit' value='Guardar'>
-                <input type='submit' name='submit' value='Cancelar'>
-                <input  type='hidden' name='tabla' value='<?php echo $nombreTabla ?>'>
+            <form action="editar.php" method="POST">
+                <?php obtenerFormulario($campos, $boton); ?>
+                <input type='submit' name='accion' value='<?php echo $btn ?>'>
+                <input type='submit' name='accion' value='Cancelar'>
+                <input  type='hidden' name='nombreTabla' value='<?php echo $nombreTabla ?>'>
             </form>
         </fieldset>
     </body>

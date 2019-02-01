@@ -5,16 +5,18 @@ spl_autoload_register(function($nombre_clase) {
 
 session_start();
 
-$nombreTabla = $_POST['botones'];
 $host = $_SESSION['conexion'][0];
 $user = $_SESSION['conexion'][1];
 $pass = $_SESSION['conexion'][2];
 $bd = $_SESSION['conexion'][3];
-$con = new BD($host, $user, $pass, $bd);
-
-if (!isset($nombreTabla)) {
-    $nombreTabla = $_GET['tabla'];
+$nombreTabla = "";
+if (isset($_POST['botones'])) {
+    $nombreTabla = $_POST['botones'];
+} else {
+    $nombreTabla = $_GET['nombreTabla'];
 }
+
+$con = new BD($host, $user, $pass, $bd);
 
 function obtenerTabla($con, $nombreTabla) {
     $campos = $con->nombres_campos($nombreTabla);
@@ -23,51 +25,53 @@ function obtenerTabla($con, $nombreTabla) {
     foreach ($campos as $campo) {
         $tabla .= "<th> $campo</th>";
     }
-    $tabla .= "<th> Acciones</th>";
+    $tabla .= "<th colspan='2'> Acciones</th>";
     $tabla .= "</tr>";
     foreach ($filas as $datos) {
         $tabla .= "<tr><form action = 'gestionTabla.php' method = POST>";
         foreach ($campos as $i => $fila) {
             $tabla .= "<td>$datos[$i]</td>"
                     . "<input type = hidden value = '$datos[$i]' name = 'campos[$campos[$i]]' >"
-                    . "<input type = hidden value = '$nombreTabla' name = 'tabla' >";
+                    . "<input type = hidden value = '$nombreTabla' name = 'nombreTabla' >";
         }
-        $tabla .= "<td><input type = 'submit' value = 'Editar' name = 'submit'><input type = 'submit' value = 'Delete' name = 'submit'></td></form>"
+        $tabla .= "<td><input type = 'submit' value = 'Editar' name = 'submit'></td>"
+                . "<td><input type = 'submit' value = 'Delete' name = 'submit'></td></form>"
                 . "</tr>";
     }
     $tabla .= "</table>";
     return $tabla;
 }
 
-function borrar($tabla, $con) {
-    $filas = $con->selection("SELECT * FROM $tabla");
-    $sentencia = "DELETE FROM $tabla WHERE ";
-    foreach ($filas as $campo => $dato) {
-        $columna = substr($campo, 1); // Quitar : = KEY del array asociativo...
-        $sentencia .= "$columna=$campo AND ";
+function borrar($nombreTabla, $campos) {
+    $sentencia = "DELETE FROM $nombreTabla WHERE ";
+    foreach ($campos as $i => $campo) {
+        $sentencia .= "$i = '" . $campo . "' and ";
     }
-
-    $sql = substr($sentencia, 0, strlen($sentencia) - 4);
-    return $con->run($sql, $filas);
+    $sentencia = substr($sentencia, 0, strlen($sentencia) - 4);
+    return $sentencia;
 }
 
 if (isset($_POST['submit'])) {
+    $campos = $_POST['campos'];
+    $nombreTabla = $_POST['nombreTabla'];
     switch ($_POST['submit']) {
         case "Delete":
-            $nombreTabla = $_POST['tabla'];
-            $result = $con > borrar($nombreTabla, $con); // Controlar que RECARGE LA PAGINA
-            header("Location: gestionTabla.php");
-            $bd->close(); // Cerrar conexión BBDD...
-
+            $c = borrar($nombreTabla, $campos);
+            $con->run($c);
             break;
         case "Editar":
-            header("Location: editar.php");
+            $campos = serialize($campos);
+            header("Location:editar.php?campos=$campos&tabla=$nombreTabla");
             break;
         case "Add":
-            header("Location: editar.php");
+            $boton = "añadir";
+            $campos = serialize($campos);
+            header("Location:editar.php?campos=$campos&tabla=$nombreTabla&boton=$boton");
             break;
         case "Close":
             header("Location: tablas.php");
+            break;
+        default:
             break;
     }
 }
@@ -84,11 +88,14 @@ if (isset($_POST['submit'])) {
     <body>
         <fieldset style="width:70%">
             <legend>Admnistración de la tabla <span  style="color:red"><?php echo $nombreTabla ?></span></legend>
-                <?php echo obtenerTabla($con, $nombreTabla) ?? null ?>
+
             <form action="gestionTabla.php" method="post">
+                <?php echo obtenerTabla($con, $nombreTabla) ?>
+                <input type="hidden" name ="botones" value="<?php echo $nombreTabla ?>">
+                <input type="hidden" name ="tabla" value="<?php echo $nombreTabla ?>">
+                <input type="hidden" name ="bd" value="<?php echo $bd ?>">
                 <input type="submit" value="Add" name="submit">
                 <input type="submit" value="Close" name="submit">
-                <input type = hidden value = '<?php $nombreTabla ?>' name = 'tabla' >
             </form>
         </fieldset>
     </body>
