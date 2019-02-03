@@ -1,4 +1,3 @@
-
 <?php
 spl_autoload_register(function($nombre_clase) {
     include $nombre_clase . '.php';
@@ -8,6 +7,7 @@ $conectado = false;
 $radios = "";
 $error = "";
 session_start();
+//Si vengo del submit conectar.
 if (isset($_POST['conectar'])) {
     $user = $_POST['usuario'];
     $pass = $_POST['pass'];
@@ -25,6 +25,7 @@ if (isset($_POST['conectar'])) {
     $_SESSION['conexion'] = [$host, $user, $pass];
     $con->cerrar();
 }
+
 if (isset($_SESSION['conexion'])) {
 //Si ya he establecido previamente conexión, recojo los datos de sesión
 //Si no contendrán null y la conexión fallará y me informará de ello
@@ -36,13 +37,13 @@ if (isset($_SESSION['conexion'])) {
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Ejemplo de estilos CSS en un archivo externo</title>
         <link rel="stylesheet" type="text/css" href="estilos.css" media="screen">
         <meta charset="UTF-8">
-        <title></title>
+        <title>Login</title>
 
     </head>
     <body>
+        <!--muestro el error si no es null-->
         <header><?php echo $error ?? null ?></header>
         <fieldset id="sup" style="width:70%">
             <legend>Datos de conexión</legend>
@@ -57,6 +58,7 @@ if (isset($_SESSION['conexion'])) {
             </form>
 
         </fieldset>
+        <!--Solo si estoy conectado mostrare este fieldset-->
         <?php if ($conectado == true): ?>
             <fieldset style = "width:70%; margin-top:8%">
                 <legend>Gestion de las Bases de Datos del host <span class = "resaltar"><span style="color:red"><?php echo $host
@@ -65,6 +67,7 @@ if (isset($_SESSION['conexion'])) {
                     <br/>
                     <input type="submit"value="Gestionar" name="gestionar"><br>
                     <?php
+                    //muestro las bases con su input radio
                     echo $radios;
                     ?>
                 </form>

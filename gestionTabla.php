@@ -4,19 +4,23 @@ spl_autoload_register(function($nombre_clase) {
 });
 
 session_start();
-
+//Recogemos las variables de la conexion y nos conectamos.
 $host = $_SESSION['conexion'][0];
 $user = $_SESSION['conexion'][1];
 $pass = $_SESSION['conexion'][2];
 $bd = $_SESSION['conexion'][3];
+$con = new BD($host, $user, $pass, $bd);
+
 $nombreTabla = "";
+
+
 if (isset($_POST['botones'])) {
+    //Si vengo del submit botones del fichero tablas
     $nombreTabla = $_POST['botones'];
 } else {
+
     $nombreTabla = $_GET['nombreTabla'];
 }
-
-$con = new BD($host, $user, $pass, $bd);
 
 function obtenerTabla($con, $nombreTabla) {
     $campos = $con->nombres_campos($nombreTabla);
@@ -58,15 +62,19 @@ if (isset($_POST['submit'])) {
         case "Delete":
             $c = borrar($nombreTabla, $campos);
             $con->run($c);
+            $error = $con->getError();
             break;
         case "Editar":
             $campos = serialize($campos);
-            header("Location:editar.php?campos=$campos&tabla=$nombreTabla");
+            $_SESSION['campos'] = $campos;
+            header("Location:editar.php?tabla=$nombreTabla");
             break;
         case "Add":
             $boton = "añadir";
             $campos = serialize($campos);
-            header("Location:editar.php?campos=$campos&tabla=$nombreTabla&boton=$boton");
+            $_SESSION['campos'] = $campos;
+
+            header("Location:editar.php?tabla=$nombreTabla&boton=$boton");
             break;
         case "Close":
             header("Location: tablas.php");
@@ -86,8 +94,9 @@ if (isset($_POST['submit'])) {
         <meta charset="ISO-8859-1">
     </head>
     <body>
+        <header><?php echo $con->getError() ?? null ?></header>
         <fieldset style="width:70%">
-            <legend>Admnistración de la tabla <span  style="color:red"><?php echo $nombreTabla ?></span></legend>
+            <legend>Admnistración de la tabla <span style="color:red"><?php echo $nombreTabla ?></span></legend>
 
             <form action="gestionTabla.php" method="post">
                 <?php echo obtenerTabla($con, $nombreTabla) ?>

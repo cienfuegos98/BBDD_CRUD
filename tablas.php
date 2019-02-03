@@ -7,8 +7,10 @@ spl_autoload_register(function($nombre_clase) {
 session_start();
 if ($_POST['gestionar']) {
     $bd = $_POST['radio'];
+    if (is_null($bd)) {
+        header("Location:index.php");
+    }
 }
-
 $host = $_SESSION['conexion'][0];
 $user = $_SESSION['conexion'][1];
 $pass = $_SESSION['conexion'][2];
@@ -33,12 +35,13 @@ if ($error == null) {
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Ejemplo de estilos CSS en un archivo externo</title>
+        <title>Listado</title>
         <link rel="stylesheet" type="text/css" href="estilos.css" media="screen">
         <meta charset="UTF-8">
         <title></title>
     </head>
     <body>
+        <header><?php echo $error ?? null ?></header>
         <fieldset id="sup" style="width:25%">
             <legend>Listado bases de datos de <span  style="color:red"><?php echo $bd ?></span></legend>
             <form action="index.php" method="POST">

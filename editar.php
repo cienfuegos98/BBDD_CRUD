@@ -14,15 +14,14 @@ $bd = $_SESSION['conexion'][3];
 $con = new BD($host, $user, $pass, $bd);
 
 $boton = $_GET['boton'];
-if ($_GET['boton'] == "añadir") {
-    $nombreTabla = $_GET['tabla'];
-    $campos = $_GET['campos'];
-    $campos = unserialize($campos);
+$campos = $_SESSION['campos'];
+$campos = unserialize($campos);
+$nombreTabla = $_GET['tabla'];
+if ($boton == "añadir") {
+
     $btn = "Insertar";
 } else {
-    $campos = $_GET['campos'];
-    $campos = unserialize($campos);
-    $nombreTabla = $_GET['tabla'];
+
     $btn = "Guardar";
 }
 
@@ -31,7 +30,7 @@ function obtenerFormulario($campos, $boton) {
         if ($boton == "añadir") {
             echo "<label>$i</label>"
             . "<input type='text' name='valorNuevo[]' value=''><br>"
-            . "<input type='hidden' name='campos[$i]' value=''><br>"
+            . "<input type='hidden' name='campos[$i]' value='$campo'><br>"
             . "<input type='hidden' name='valorAnt[]' value=''><br>";
         } else {
             echo "<label>$i</label>"
@@ -106,7 +105,7 @@ function generaInsert($nombreTabla, $campos, $valorNuevo) {
         <meta charset="UTF-8">
         <title>Document</title>
         <link rel="stylesheet" type="text/css" href="estilos.css" media="screen">
-
+        <title>Tabla</title>
         <style>
             textarea{
                 width: 350px;
@@ -122,6 +121,7 @@ function generaInsert($nombreTabla, $campos, $valorNuevo) {
         </style>
     </head>
     <body>
+        <header><?php echo $error ?? null ?></header>
         <fieldset>
             <legend><h2>Editanto Registro de la tabla <span style="color: red"><?php echo $nombreTabla ?></span></h2></legend>
             <form action="editar.php" method="POST">

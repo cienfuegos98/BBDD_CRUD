@@ -65,8 +65,12 @@ class BD {
     }
 
     public function run($c) {
-        $stmt = $this->con->prepare($c);
-        $stmt->execute();
+        try {
+            $stmt = $this->con->prepare($c);
+            $stmt->execute();
+        } catch (Exception $e) {
+            $this->error = $e->getMessage();
+        }
     }
 
 }
